@@ -242,7 +242,7 @@ const DEPT_CONFIG = [
       { label:'北區', names:['郭嘉龍','邱建銘','侯福正','徐宏杰','游皓明'] },
       { label:'中區', names:['范國隆','林俊毅'] },
       { label:'南區', names:['張詠順','楊宗諺','林易澤'] },
-      { label:'出差區', names:['鄭舜生','謝承凱'] },
+      { label:'出差區', names:['鄭舜生','謝承凱'], onlyMetrics:['deacid_recv_cum'] },
     ],
     metrics: [
       { key:'ad_fam_cum',       label:'廣告收款家數累計',       unit:'家', type:'cum', hasTarget:false },
@@ -377,7 +377,7 @@ function renderAll() {
   const dk      = dept.dataKey;
   const raw     = DATA[dk].raw;
   const targets = DATA[dk].targets;
-  const allNames = dept.regions.flatMap(r => r.names);
+  const allNames = dept.regions.filter(r => !r.onlyMetrics || r.onlyMetrics.includes(metric.key)).flatMap(r => r.names);
 
   // 最新日期
   const latestDate = raw.length ? raw.map(r => r.date).sort().reverse()[0] : '--';
@@ -428,7 +428,7 @@ function renderAll() {
   document.getElementById('detail-wrap').innerHTML = `
     <div class="detail-title">${metric.label} — 區域明細</div>
     <div class="detail-hint">${hasTarget ? '進度條依達成率顯示' : '此指標無目標值，僅顯示累計數字'}</div>
-    ${dept.regions.map(region => {
+    ${dept.regions.filter(region => !region.onlyMetrics || region.onlyMetrics.includes(metric.key)).map(region => {
       const regionVals = region.names.map(n => getValue(raw, n, metric.key, metric.type));
       const regionMax  = Math.max(...regionVals, 1);
       const rowsHtml = region.names.map((name, ni) => {
