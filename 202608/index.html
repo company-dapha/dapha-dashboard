@@ -428,7 +428,7 @@ function renderAll() {
   const hasTarget = metric.hasTarget;
   document.getElementById('detail-wrap').innerHTML = `
     <div class="detail-title">${metric.label} — 區域明細</div>
-    <div class="detail-hint">${hasTarget ? '進度條依達成率顯示' : '此指標無目標值，僅顯示數字排名'}</div>
+    <div class="detail-hint">${hasTarget ? '進度條依達成率顯示' : '此指標無目標值，僅顯示累計數字'}</div>
     ${dept.regions.map(region => {
       const regionVals = region.names.map(n => getValue(raw, n, metric.key, metric.type));
       const regionMax  = Math.max(...regionVals, 1);
