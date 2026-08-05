@@ -221,17 +221,17 @@ const DEPT_CONFIG = [
       { label:'南區', names:['李仲亨','鄭舜生','陳志建'] },
     ],
     metrics: [
-      { key:'ad_fam_cum',       label:'廣告收款家數累計',   unit:'家', type:'cum', hasTarget:false },
-      { key:'ad_recv_cum',      label:'廣告收款金額累計',   unit:'元', type:'cum', hasTarget:false },
-      { key:'s1_fam_cum',       label:'淺一收款家數累計',   unit:'家', type:'cum', hasTarget:false },
-      { key:'s1_recv_cum',      label:'淺一收款金額累計',   unit:'元', type:'cum', hasTarget:false },
-      { key:'orders',           label:'訂單家數',           unit:'家', type:'new', hasTarget:false },
-      { key:'ratio_prod',       label:'佔比產品數',         unit:'樣', type:'new', hasTarget:false },
-      { key:'banq_cum',         label:'88宴會口累計',       unit:'口', type:'cum', hasTarget:false },
-      { key:'cystine_cum',      label:'朓白錠家數',         unit:'家', type:'cum', hasTarget:true  },
-      { key:'cystine_box_cum',  label:'朓白錠盒數',         unit:'盒', type:'cum', hasTarget:true  },
-      { key:'probio_trad_cum',  label:'益生菌陳列傳統家數', unit:'家', type:'cum', hasTarget:true  },
-      { key:'probio_chain_cum', label:'益生菌陳列連鎖家數', unit:'家', type:'cum', hasTarget:false },
+      { key:'ad_fam_cum',       label:'廣告收款家數累計',   unit:'家', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'ad_recv_cum',      label:'廣告收款金額累計',   unit:'元', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'s1_fam_cum',       label:'淺一收款家數累計',   unit:'家', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'s1_recv_cum',      label:'淺一收款金額累計',   unit:'元', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'orders',           label:'訂單家數',           unit:'家', type:'new', hasTarget:false, period:'month' },
+      { key:'ratio_prod',       label:'佔比產品數',         unit:'樣', type:'new', hasTarget:false, period:'month' },
+      { key:'banq_cum',         label:'88宴會口累計',       unit:'口', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'cystine_cum',      label:'朓白錠家數',         unit:'家', type:'cum', hasTarget:true,  period:'q4'    },
+      { key:'cystine_box_cum',  label:'朓白錠盒數',         unit:'盒', type:'cum', hasTarget:true,  period:'q4'    },
+      { key:'probio_trad_cum',  label:'益生菌陳列傳統家數', unit:'家', type:'cum', hasTarget:true,  period:'month' },
+      { key:'probio_chain_cum', label:'益生菌陳列連鎖家數', unit:'家', type:'cum', hasTarget:false, period:'month' },
     ],
     dataKey: 's1',
   },
@@ -245,17 +245,17 @@ const DEPT_CONFIG = [
       { label:'出差區', names:['鄭舜生','謝承凱'], onlyMetrics:['deacid_recv_cum'] },
     ],
     metrics: [
-      { key:'ad_fam_cum',       label:'廣告收款家數累計',       unit:'家', type:'cum', hasTarget:false },
-      { key:'ad_recv_cum',      label:'廣告收款金額累計',       unit:'元', type:'cum', hasTarget:false },
-      { key:'s2_fam_cum',       label:'淺二收款家數累計',       unit:'家', type:'cum', hasTarget:false },
-      { key:'s2_recv_cum',      label:'淺二收款金額累計',       unit:'元', type:'cum', hasTarget:false },
-      { key:'orders',           label:'訂單家數',               unit:'家', type:'new', hasTarget:false },
-      { key:'ratio_prod',       label:'佔比產品數',             unit:'樣', type:'new', hasTarget:false },
-      { key:'banq_cum',         label:'88宴會口累計',           unit:'口', type:'cum', hasTarget:false },
-      { key:'magnet_fam_cum',   label:'磁力絆家數',             unit:'家', type:'cum', hasTarget:false },
-      { key:'magnet_grp_cum',   label:'磁力絆口數',             unit:'口', type:'cum', hasTarget:false },
-      { key:'probio_chain_cum', label:'益生菌陳列連鎖家數',     unit:'家', type:'cum', hasTarget:false },
-      { key:'deacid_recv_cum',  label:'脫酸寧退熱貼回收家數',   unit:'家', type:'cum', hasTarget:true  },
+      { key:'ad_fam_cum',       label:'廣告收款家數累計',       unit:'家', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'ad_recv_cum',      label:'廣告收款金額累計',       unit:'元', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'s2_fam_cum',       label:'淺二收款家數累計',       unit:'家', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'s2_recv_cum',      label:'淺二收款金額累計',       unit:'元', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'orders',           label:'訂單家數',               unit:'家', type:'new', hasTarget:false, period:'month' },
+      { key:'ratio_prod',       label:'佔比產品數',             unit:'樣', type:'new', hasTarget:false, period:'month' },
+      { key:'banq_cum',         label:'88宴會口累計',           unit:'口', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'magnet_fam_cum',   label:'磁力絆家數',             unit:'家', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'magnet_grp_cum',   label:'磁力絆口數',             unit:'口', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'probio_chain_cum', label:'益生菌陳列連鎖家數',     unit:'家', type:'cum', hasTarget:false, period:'month' },
+      { key:'deacid_recv_cum',  label:'脫酸寧退熱貼回收家數',   unit:'家', type:'cum', hasTarget:true,  period:'month' },
     ],
     dataKey: 's2',
   },
@@ -379,6 +379,9 @@ function renderAll() {
   const targets = DATA[dk].targets;
   const allNames = dept.regions.filter(r => !r.onlyMetrics || r.onlyMetrics.includes(metric.key)).flatMap(r => r.names);
 
+  // ── 依指標決定「第四期累計」還是「本月累計」的文字 ──
+  const periodLabel = metric.period === 'month' ? '本月累計' : '第四期累計';
+
   // 最新日期
   const latestDate = raw.length ? raw.map(r => r.date).sort().reverse()[0] : '--';
   document.getElementById('update-time').textContent = '更新：' + latestDate;
@@ -404,7 +407,7 @@ function renderAll() {
     <div class="summary-card">
       <div class="card-label">全隊${metric.label}</div>
       <div class="card-num">${fmtNum(total, metric.unit)}</div>
-      <div class="card-unit">${metric.unit}（第四期累計）</div>
+      <div class="card-unit">${metric.unit}（${periodLabel}）</div>
     </div>
     <div class="summary-card">
       <div class="card-label">個人最高</div>
@@ -419,7 +422,7 @@ function renderAll() {
     <div class="summary-card">
       <div class="card-label">最新資料日期</div>
       <div class="card-num">${latestDate}</div>
-      <div class="card-unit">本月累計</div>
+      <div class="card-unit">${periodLabel}</div>
     </div>
   `;
 
