@@ -381,7 +381,7 @@ function renderAll() {
   const allNames = dept.regions.filter(r => !r.onlyMetrics || r.onlyMetrics.includes(metric.key)).flatMap(r => r.names);
 
   // ── 依指標決定「第四期累計」還是「本月累計」的文字 ──
-  const periodLabel = metric.period === 'month' ? '本月累計' : '第四期累計';
+  const periodLabel = metric.period === 'month' ? '本月累計' : '第五期累計';
 
   // 最新日期
   const latestDate = raw.length ? raw.map(r => r.date).sort().reverse()[0] : '--';
