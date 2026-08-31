@@ -1,1 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大法業績日報 Dashboard</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+  background: #f2f2f2;
+  color: #222;
+  min-height: 100vh;
+}
 
+/* ── Header ── */
+.header {
+  background: #c0152a;
+  color: #fff;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.header-left { display: flex; align-items: center; gap: 14px; }
+.header-dot { width: 10px; height: 10px; border-radius: 50%; background: #fff; opacity: 0.9; }
+.header-title { font-size: 1rem; font-weight: 700; letter-spacing: 2px; }
+.header-sub { font-size: 0.72rem; opacity: 0.7; letter-spacing: 1px; }
+.header-right { display: flex; align-items: center; gap: 12px; font-size: 0.78rem; opacity: 0.85; }
+.refresh-btn {
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.4);
+  color: #fff;
+  padding: 5px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+.refresh-btn:hover { background: rgba(255,255,255,0.35); }
+
+/* ── Dept Tabs ── */
+.dept-tabs {
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  padding: 0 24px;
+}
+.dept-tab {
+  padding: 14px 20px 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #888;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.2s;
+  letter-spacing: 1px;
+}
+.dept-tab.active { color: #c0152a; border-bottom-color: #c0152a; }
+
+/* ── Metric Tabs ── */
+.metric-tabs-wrap {
+  background: #fff;
+  padding: 12px 20px;
+  border-bottom: 1px solid #e8e8e8;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.metric-tab {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid #ddd;
+  background: #fff;
+  color: #555;
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.metric-tab:hover { border-color: #c0152a; color: #c0152a; }
+.metric-tab.active { background: #c0152a; border-color: #c0152a; color: #fff; font-weight: 600; }
+
+/* ── Summary Cards ── */
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding: 16px 20px;
+  max-width: 1200px;
+}
+@media (max-width: 760px) {
+  .summary-cards { grid-template-columns: repeat(2, 1fr); }
+}
+.summary-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px 18px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+.summary-card .card-label { font-size: 0.74rem; color: #aaa; margin-bottom: 6px; }
+.summary-card .card-num { font-size: 2rem; font-weight: 700; color: #c0152a; line-height: 1.1; }
+.summary-card .card-unit { font-size: 0.74rem; color: #aaa; margin-top: 4px; }
+.summary-card .card-name { font-size: 0.82rem; color: #666; margin-top: 2px; }
+
+/* ── Detail Section ── */
+.detail-wrap {
+  padding: 0 20px 30px;
+  max-width: 1200px;
+}
+.detail-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #c0152a;
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+.detail-hint { font-size: 0.74rem; color: #aaa; margin-bottom: 14px; }
+
+/* ── Region block ── */
+.region-block { margin-bottom: 18px; }
+.region-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.region-bar { width: 4px; height: 18px; background: #c0152a; border-radius: 2px; }
+.region-name { font-size: 0.82rem; font-weight: 700; color: #444; letter-spacing: 1px; }
+
+/* ── Rep rows ── */
+.rep-row {
+  display: flex;
+  align-items: center;
+  padding: 9px 14px;
+  background: #fff;
+  border-bottom: 1px solid #f2f2f2;
+  gap: 12px;
+}
+.region-block .rep-row:first-of-type { border-radius: 8px 8px 0 0; }
+.region-block .rep-row:last-of-type  { border-radius: 0 0 8px 8px; border-bottom: none; }
+.region-block .rep-row:only-of-type  { border-radius: 8px; border-bottom: none; }
+.rep-name { font-size: 0.88rem; font-weight: 600; min-width: 54px; color: #222; }
+.bar-outer { flex: 1; height: 10px; background: #f0f0f0; border-radius: 5px; overflow: hidden; }
+.bar-inner { height: 100%; border-radius: 5px; transition: width 0.5s ease; min-width: 0; }
+.rep-val  { font-size: 0.82rem; color: #555; min-width: 68px; text-align: right; }
+.rep-pct  { font-size: 0.88rem; font-weight: 700; min-width: 50px; text-align: right; }
+
+/* ── Demo notice ── */
+.demo-notice {
+  background: #fff8e1;
+  border-left: 4px solid #ffc107;
+  padding: 8px 16px;
+  font-size: 0.78rem;
+  color: #7a5c00;
+  margin: 10px 20px;
+  border-radius: 0 4px 4px 0;
+}
+
+.loading { text-align: center; padding: 50px; color: #bbb; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-dot"></div>
+    <div>
+      <div class="header-title">大法業績日報</div>
+      <div class="header-sub">DASHBOARD · 2026年8月</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span id="update-time">--</span>
+    <button class="refresh-btn" onclick="loadData()">重新整理</button>
+  </div>
+</div>
+
+<!-- Dept Tabs -->
+<div class="dept-tabs">
+  <div class="dept-tab active" onclick="switchDept(0,this)">淺一部</div>
+  <div class="dept-tab"       onclick="switchDept(1,this)">淺二部</div>
+</div>
+
+<!-- Metric Tabs -->
+<div class="metric-tabs-wrap" id="metric-tabs"></div>
+
+<!-- Demo Notice -->
+<div id="demo-notice-area"></div>
+
+<!-- Summary Cards -->
+<div class="summary-cards" id="summary-cards">
+  <div class="loading">資料載入中…</div>
+</div>
+
+<!-- Detail -->
+<div class="detail-wrap" id="detail-wrap"></div>
+
+<script>
+// ════════════════════════════════════════
+// ① 設定區  ← 部署後填入新 Apps Script 網址
+// ════════════════════════════════════════
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwibmxJpuhjZvgKKR-ZTJRrU9jBJr8KPaLQaPCGON8UpFilHs_vQLqszJMjJdZ3io-lyQ/exec';
+
+const DEPT_CONFIG = [
+  // ── 淺一部 ──
+  // 益生菌陳列(傳統/連鎖)已不再回報,對應的兩個指標拿掉。
+  {
+    name: '淺一部',
+    regions: [
+      { label:'北區', names:['陳俊禹','林星樺','林宗德','陳永翰','謝承凱','賞天佑'] },
+      { label:'中區', names:['陳坤謨','魏鴻茂','吳駿宏'] },
+      { label:'南區', names:['李仲亨','鄭舜生','陳志建'] },
+    ],
+    metrics: [
+      { key:'ad_fam_cum',       label:'廣告收款家數累計',   unit:'家', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'ad_recv_cum',      label:'廣告收款金額累計',   unit:'元', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'s1_fam_cum',       label:'淺一收款家數累計',   unit:'家', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'s1_recv_cum',      label:'淺一收款金額累計',   unit:'元', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'orders',           label:'訂單家數',           unit:'家', type:'new', hasTarget:false, period:'month' },
+      { key:'ratio_prod',       label:'佔比產品數',         unit:'樣', type:'new', hasTarget:false, period:'month' },
+      { key:'banq_cum',         label:'88宴會口累計',       unit:'口', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'cystine_cum',      label:'胱白錠家數',         unit:'家', type:'cum', hasTarget:true,  period:'q4'    },
+      { key:'cystine_box_cum',  label:'胱白錠盒數',         unit:'盒', type:'cum', hasTarget:true,  period:'q4'    },
+    ],
+    dataKey: 's1',
+  },
+  // ── 淺二部 ──
+  // 磁力絆(1品項)換成可立護+甲子社(2品項);益生菌陳列連鎖已不再回報。
+  {
+    name: '淺二部',
+    regions: [
+      { label:'北區', names:['郭嘉龍','邱建銘','侯福正','徐宏杰','游皓明'] },
+      { label:'中區', names:['范國隆','林俊毅'] },
+      { label:'南區', names:['張詠順','楊宗諺','林易澤'] },
+      { label:'出差區', names:['鄭舜生','謝承凱'], onlyMetrics:['deacid_recv_cum'] },
+    ],
+    metrics: [
+      { key:'ad_fam_cum',        label:'廣告收款家數累計',       unit:'家', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'ad_recv_cum',       label:'廣告收款金額累計',       unit:'元', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'s2_fam_cum',        label:'淺二收款家數累計',       unit:'家', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'s2_recv_cum',       label:'淺二收款金額累計',       unit:'元', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'orders',            label:'訂單家數',               unit:'家', type:'new', hasTarget:false, period:'month' },
+      { key:'ratio_prod',        label:'佔比產品數',             unit:'樣', type:'new', hasTarget:false, period:'month' },
+      { key:'banq_cum',          label:'88宴會口累計',           unit:'口', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'kelihu_fam_cum',    label:'可立護家數',             unit:'家', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'kelihu_grp_cum',    label:'可立護口數',             unit:'口', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'jiazishe_fam_cum',  label:'甲子社家數',             unit:'家', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'jiazishe_grp_cum',  label:'甲子社口數',             unit:'口', type:'cum', hasTarget:false, period:'q4'    },
+      { key:'deacid_recv_cum',   label:'脫酸寧退熱貼回收家數',   unit:'家', type:'cum', hasTarget:true,  period:'month' },
+    ],
+    dataKey: 's2',
+  },
+];
+
+// ── Fallback 示範資料（網路斷線時顯示）──
+const FALLBACK = {
+  s1: {
+    raw: [
+      { date:'08/01', name:'陳俊禹', ad_fam_cum:0, ad_recv_cum:0, s1_fam_cum:0, s1_recv_cum:0, orders:9, ratio_prod:1, banq_cum:12, cystine_cum:10, cystine_box_cum:20 },
+      { date:'08/01', name:'林星樺', ad_fam_cum:0, ad_recv_cum:0, s1_fam_cum:0, s1_recv_cum:0, orders:3, ratio_prod:1, banq_cum:3.5, cystine_cum:3, cystine_box_cum:10 },
+      { date:'08/01', name:'林宗德', ad_fam_cum:1, ad_recv_cum:2000000, s1_fam_cum:0, s1_recv_cum:0, orders:7, ratio_prod:2, banq_cum:5, cystine_cum:8, cystine_box_cum:10 },
+      { date:'08/01', name:'陳永翰', ad_fam_cum:0, ad_recv_cum:0, s1_fam_cum:0, s1_recv_cum:0, orders:7, ratio_prod:3, banq_cum:5, cystine_cum:3, cystine_box_cum:3 },
+      { date:'08/01', name:'謝承凱', ad_fam_cum:0, ad_recv_cum:0, s1_fam_cum:0, s1_recv_cum:0, orders:2, ratio_prod:2, banq_cum:0, cystine_cum:4, cystine_box_cum:7 },
+      { date:'08/01', name:'賞天佑', ad_fam_cum:1, ad_recv_cum:626, s1_fam_cum:0, s1_recv_cum:0, orders:8, ratio_prod:1, banq_cum:5, cystine_cum:5, cystine_box_cum:9 },
+      { date:'08/01', name:'陳坤謨', ad_fam_cum:0, ad_recv_cum:0, s1_fam_cum:0, s1_recv_cum:0, orders:4, ratio_prod:2, banq_cum:7.5, cystine_cum:10, cystine_box_cum:17 },
+      { date:'08/01', name:'魏鴻茂', ad_fam_cum:0, ad_recv_cum:0, s1_fam_cum:0, s1_recv_cum:0, orders:9, ratio_prod:1, banq_cum:12, cystine_cum:2, cystine_box_cum:3 },
+      { date:'08/01', name:'吳駿宏', ad_fam_cum:0, ad_recv_cum:0, s1_fam_cum:0, s1_recv_cum:0, orders:3, ratio_prod:0, banq_cum:5.5, cystine_cum:4, cystine_box_cum:5 },
+      { date:'08/01', name:'李仲亨', ad_fam_cum:0, ad_recv_cum:0, s1_fam_cum:0, s1_recv_cum:0, orders:9, ratio_prod:2, banq_cum:4.5, cystine_cum:8, cystine_box_cum:13 },
+      { date:'08/01', name:'鄭舜生', ad_fam_cum:0, ad_recv_cum:0, s1_fam_cum:0, s1_recv_cum:0, orders:3, ratio_prod:2, banq_cum:4, cystine_cum:7, cystine_box_cum:19 },
+      { date:'08/01', name:'陳志建', ad_fam_cum:0, ad_recv_cum:0, s1_fam_cum:0, s1_recv_cum:0, orders:0, ratio_prod:0, banq_cum:0, cystine_cum:0, cystine_box_cum:0 },
+    ],
+    targets: {
+      陳俊禹:{ cystine_cum:18, cystine_box_cum:108 },
+      林星樺:{ cystine_cum:18, cystine_box_cum:108 },
+      林宗德:{ cystine_cum:18, cystine_box_cum:108 },
+      陳永翰:{ cystine_cum:18, cystine_box_cum:108 },
+      謝承凱:{ cystine_cum:18, cystine_box_cum:108 },
+      賞天佑:{ cystine_cum:18, cystine_box_cum:108 },
+      陳坤謨:{ cystine_cum:18, cystine_box_cum:108 },
+      魏鴻茂:{ cystine_cum:18, cystine_box_cum:108 },
+      吳駿宏:{ cystine_cum:18, cystine_box_cum:108 },
+      李仲亨:{ cystine_cum:18, cystine_box_cum:108 },
+      鄭舜生:{ cystine_cum:18, cystine_box_cum:108 },
+      陳志建:{ cystine_cum:18, cystine_box_cum:108 },
+    }
+  },
+  s2: {
+    raw: [
+      { date:'08/01', name:'郭嘉龍', ad_fam_cum:0, ad_recv_cum:0, s2_fam_cum:0, s2_recv_cum:0, orders:6, ratio_prod:1, banq_cum:3.5, kelihu_fam_cum:0, kelihu_grp_cum:0, jiazishe_fam_cum:0, jiazishe_grp_cum:0, deacid_recv_cum:0 },
+      { date:'08/01', name:'邱建銘', ad_fam_cum:0, ad_recv_cum:0, s2_fam_cum:0, s2_recv_cum:0, orders:4, ratio_prod:2, banq_cum:3, kelihu_fam_cum:0, kelihu_grp_cum:0, jiazishe_fam_cum:0, jiazishe_grp_cum:0, deacid_recv_cum:0 },
+      { date:'08/01', name:'侯福正', ad_fam_cum:0, ad_recv_cum:0, s2_fam_cum:0, s2_recv_cum:0, orders:5, ratio_prod:1, banq_cum:2, kelihu_fam_cum:0, kelihu_grp_cum:0, jiazishe_fam_cum:0, jiazishe_grp_cum:0, deacid_recv_cum:0 },
+      { date:'08/01', name:'徐宏杰', ad_fam_cum:0, ad_recv_cum:0, s2_fam_cum:0, s2_recv_cum:0, orders:10, ratio_prod:2, banq_cum:5.5, kelihu_fam_cum:2, kelihu_grp_cum:3, jiazishe_fam_cum:0, jiazishe_grp_cum:0, deacid_recv_cum:0 },
+      { date:'08/01', name:'游皓明', ad_fam_cum:0, ad_recv_cum:0, s2_fam_cum:1, s2_recv_cum:3216, orders:9, ratio_prod:1, banq_cum:11, kelihu_fam_cum:1, kelihu_grp_cum:5, jiazishe_fam_cum:0, jiazishe_grp_cum:0, deacid_recv_cum:0 },
+      { date:'08/01', name:'范國隆', ad_fam_cum:0, ad_recv_cum:0, s2_fam_cum:0, s2_recv_cum:0, orders:6, ratio_prod:1, banq_cum:7, kelihu_fam_cum:1, kelihu_grp_cum:5, jiazishe_fam_cum:0, jiazishe_grp_cum:0, deacid_recv_cum:0 },
+      { date:'08/01', name:'林俊毅', ad_fam_cum:0, ad_recv_cum:0, s2_fam_cum:0, s2_recv_cum:0, orders:5, ratio_prod:3, banq_cum:10.5, kelihu_fam_cum:0, kelihu_grp_cum:0, jiazishe_fam_cum:0, jiazishe_grp_cum:0, deacid_recv_cum:0 },
+      { date:'08/01', name:'張詠順', ad_fam_cum:1, ad_recv_cum:20000, s2_fam_cum:0, s2_recv_cum:0, orders:5, ratio_prod:2, banq_cum:9, kelihu_fam_cum:0, kelihu_grp_cum:0, jiazishe_fam_cum:0, jiazishe_grp_cum:0, deacid_recv_cum:0 },
+      { date:'08/01', name:'楊宗諺', ad_fam_cum:1, ad_recv_cum:20000, s2_fam_cum:1, s2_recv_cum:20000, orders:7, ratio_prod:3, banq_cum:4.5, kelihu_fam_cum:0, kelihu_grp_cum:0, jiazishe_fam_cum:0, jiazishe_grp_cum:0, deacid_recv_cum:0 },
+      { date:'08/01', name:'林易澤', ad_fam_cum:0, ad_recv_cum:0, s2_fam_cum:0, s2_recv_cum:0, orders:7, ratio_prod:1, banq_cum:3, kelihu_fam_cum:0, kelihu_grp_cum:0, jiazishe_fam_cum:0, jiazishe_grp_cum:0, deacid_recv_cum:0 },
+      { date:'08/01', name:'鄭舜生', ad_fam_cum:0, ad_recv_cum:0, s2_fam_cum:0, s2_recv_cum:0, orders:0, ratio_prod:0, banq_cum:0, kelihu_fam_cum:0, kelihu_grp_cum:0, jiazishe_fam_cum:0, jiazishe_grp_cum:0, deacid_recv_cum:0 },
+      { date:'08/01', name:'謝承凱', ad_fam_cum:0, ad_recv_cum:0, s2_fam_cum:0, s2_recv_cum:0, orders:0, ratio_prod:0, banq_cum:0, kelihu_fam_cum:0, kelihu_grp_cum:0, jiazishe_fam_cum:0, jiazishe_grp_cum:0, deacid_recv_cum:0 },
+    ],
+    targets: {
+      郭嘉龍:{ deacid_recv_cum:59 },
+      邱建銘:{ deacid_recv_cum:38 },
+      侯福正:{ deacid_recv_cum:41 },
+      徐宏杰:{ deacid_recv_cum:57 },
+      游皓明:{ deacid_recv_cum:70 },
+      范國隆:{ deacid_recv_cum:65 },
+      林俊毅:{ deacid_recv_cum:73 },
+      張詠順:{ deacid_recv_cum:74 },
+      楊宗諺:{ deacid_recv_cum:118 },
+      林易澤:{ deacid_recv_cum:94 },
+      鄭舜生:{ deacid_recv_cum:9 },
+      謝承凱:{ deacid_recv_cum:3 },
+    }
+  }
+};
+
+// ════════════════════════════════════════
+// ② 狀態
+// ════════════════════════════════════════
+let DATA = { s1: { raw:[], targets:{} }, s2: { raw:[], targets:{} } };
+let IS_DEMO = false;
+let currentDept = 0;
+let currentMetric = 0;
+
+// ── 值計算 ──
+function cleanName(n) { return String(n || '').replace(/\s+/g, ''); }
+
+function getLatest(raw, name, key) {
+  const rows = raw.filter(r => cleanName(r.name) === cleanName(name))
+                  .sort((a,b) => b.date.localeCompare(a.date));
+  return rows.length ? (rows[0][key] || 0) : 0;
+}
+function getSum(raw, name, key) {
+  return raw.filter(r => cleanName(r.name) === cleanName(name))
+            .reduce((s,r) => s + (r[key] || 0), 0);
+}
+function getValue(raw, name, key, type) {
+  return type === 'new' ? getSum(raw, name, key) : getLatest(raw, name, key);
+}
+function fmtNum(v, unit) {
+  if (unit === '元' && v >= 10000) return (v / 10000).toFixed(1).replace(/\.0$/, '') + '萬';
+  return v.toLocaleString();
+}
+
+// ── 切部門 ──
+function switchDept(idx, el) {
+  currentDept = idx;
+  currentMetric = 0;
+  document.querySelectorAll('.dept-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderAll();
+}
+
+// ── 切指標 ──
+function switchMetric(idx) {
+  currentMetric = idx;
+  renderAll();
+}
+
+// ════════════════════════════════════════
+// ③ 渲染
+// ════════════════════════════════════════
+function renderAll() {
+  const dept    = DEPT_CONFIG[currentDept];
+  const metric  = dept.metrics[currentMetric];
+  const dk      = dept.dataKey;
+  const raw     = DATA[dk].raw;
+  const targets = DATA[dk].targets;
+  const allNames = dept.regions.filter(r => !r.onlyMetrics || r.onlyMetrics.includes(metric.key)).flatMap(r => r.names);
+
+  // ── 依指標決定「第四期累計」還是「本月累計」的文字 ──
+  const periodLabel = metric.period === 'month' ? '本月累計' : '第四期累計';
+
+  // 最新日期
+  const latestDate = raw.length ? raw.map(r => r.date).sort().reverse()[0] : '--';
+  document.getElementById('update-time').textContent = '更新：' + latestDate;
+
+  // demo notice
+  document.getElementById('demo-notice-area').innerHTML = IS_DEMO
+    ? '<div class="demo-notice">⚠ 目前顯示示範資料，請填入 APPS_SCRIPT_URL 後重新部署</div>'
+    : '';
+
+  // metric tabs
+  document.getElementById('metric-tabs').innerHTML = dept.metrics.map((m, i) =>
+    `<button class="metric-tab${i === currentMetric ? ' active' : ''}" onclick="switchMetric(${i})">${m.label}</button>`
+  ).join('');
+
+  // 全隊統計
+  const vals   = allNames.map(n => getValue(raw, n, metric.key, metric.type));
+  const total  = vals.reduce((a,b) => a+b, 0);
+  const maxVal = Math.max(...vals, 0);
+  const maxName = allNames[vals.indexOf(maxVal)] || '--';
+  const avg    = allNames.length ? total / allNames.length : 0;
+
+  document.getElementById('summary-cards').innerHTML = `
+    <div class="summary-card">
+      <div class="card-label">全隊${metric.label}</div>
+      <div class="card-num">${fmtNum(total, metric.unit)}</div>
+      <div class="card-unit">${metric.unit}（${periodLabel}）</div>
+    </div>
+    <div class="summary-card">
+      <div class="card-label">個人最高</div>
+      <div class="card-num">${fmtNum(maxVal, metric.unit)}</div>
+      <div class="card-name">${maxName}</div>
+    </div>
+    <div class="summary-card">
+      <div class="card-label">人均</div>
+      <div class="card-num">${fmtNum(Math.round(avg * 10) / 10, metric.unit)}</div>
+      <div class="card-unit">${metric.unit}／人</div>
+    </div>
+    <div class="summary-card">
+      <div class="card-label">最新資料日期</div>
+      <div class="card-num">${latestDate}</div>
+      <div class="card-unit">${periodLabel}</div>
+    </div>
+  `;
+
+  // detail
+  const hasTarget = metric.hasTarget;
+  document.getElementById('detail-wrap').innerHTML = `
+    <div class="detail-title">${metric.label} — 區域明細</div>
+    <div class="detail-hint">${hasTarget ? '進度條依達成率顯示' : '此指標無目標值，僅顯示累計數字'}</div>
+    ${dept.regions.filter(region => !region.onlyMetrics || region.onlyMetrics.includes(metric.key)).map(region => {
+      const regionVals = region.names.map(n => getValue(raw, n, metric.key, metric.type));
+      const regionMax  = Math.max(...regionVals, 1);
+      const rowsHtml = region.names.map((name, ni) => {
+        const val = regionVals[ni];
+        const tgt = (targets[name] && targets[name][metric.key] != null) ? targets[name][metric.key] : null;
+        const pct = (hasTarget && tgt) ? Math.round(val / tgt * 100) : null;
+        const barColor = pct === null ? '#c0152a'
+                       : pct >= 100  ? '#16a34a'
+                       : pct >= 70   ? '#c0152a'
+                       :               '#dc2626';
+        const barW = pct !== null ? Math.min(pct, 100)
+                   : maxVal > 0   ? Math.round(val / regionMax * 100) : 0;
+        return `
+          <div class="rep-row">
+            <span class="rep-name">${name}</span>
+            <div class="bar-outer">
+              <div class="bar-inner" style="width:${barW}%;background:${barColor}"></div>
+            </div>
+            <span class="rep-val">${fmtNum(val, metric.unit)} ${metric.unit}</span>
+            ${pct !== null
+              ? `<span class="rep-pct" style="color:${barColor}">${pct}%</span>`
+              : `<span class="rep-pct" style="color:#ccc">—</span>`}
+          </div>`;
+      }).join('');
+      return `
+        <div class="region-block">
+          <div class="region-label">
+            <div class="region-bar"></div>
+            <span class="region-name">${region.label}</span>
+          </div>
+          ${rowsHtml}
+        </div>`;
+    }).join('')}
+  `;
+}
+
+// ════════════════════════════════════════
+// ④ 資料載入
+// ════════════════════════════════════════
+async function loadData() {
+  document.getElementById('update-time').textContent = '載入中…';
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+    DATA = FALLBACK; IS_DEMO = true;
+    renderAll(); return;
+  }
+  try {
+    const res  = await fetch(APPS_SCRIPT_URL);
+    const json = await res.json();
+    // Apps Script 回傳格式：{ s1: { raw:[...], targets:{...} }, s2: { raw:[...], targets:{...} } }
+    DATA = {
+      s1: { raw: json.s1?.raw || [], targets: json.s1?.targets || {} },
+      s2: { raw: json.s2?.raw || [], targets: json.s2?.targets || {} },
+    };
+    IS_DEMO = false;
+  } catch(e) {
+    console.error('[DEBUG] API 失敗:', e.message);
+    DATA = FALLBACK; IS_DEMO = true;
+  }
+  renderAll();
+}
+
+loadData();
+</script>
+</body>
+</html>
