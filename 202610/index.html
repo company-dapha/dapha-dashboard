@@ -151,7 +151,7 @@ body {
 .rep-name { font-size: 0.88rem; font-weight: 600; min-width: 54px; color: #222; }
 .bar-outer { flex: 1; height: 10px; background: #f0f0f0; border-radius: 5px; overflow: hidden; }
 .bar-inner { height: 100%; border-radius: 5px; transition: width 0.5s ease; min-width: 0; }
-.rep-val  { font-size: 0.82rem; color: #555; min-width: 68px; text-align: right; }
+.rep-val  { font-size: 0.82rem; color: #555; min-width: 68px; text-align: right; white-space: nowrap; }
 .rep-pct  { font-size: 0.88rem; font-weight: 700; min-width: 50px; text-align: right; }
 
 /* ── Demo notice ── */
@@ -404,7 +404,7 @@ function renderAll() {
             <div class="bar-outer">
               <div class="bar-inner" style="width:${barW}%;background:${barColor}"></div>
             </div>
-            <span class="rep-val">${fmtNum(val, metric.unit)} ${metric.unit}</span>
+            <span class="rep-val">${(hasTarget && tgt) ? `${fmtNum(val, metric.unit)} / ${fmtNum(tgt, metric.unit)}` : fmtNum(val, metric.unit)} ${metric.unit}</span>
             ${pct !== null
               ? `<span class="rep-pct" style="color:${barColor}">${pct}%</span>`
               : `<span class="rep-pct" style="color:#ccc">—</span>`}
