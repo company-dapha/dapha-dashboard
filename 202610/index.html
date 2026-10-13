@@ -92,7 +92,7 @@ body {
 /* ── Summary Cards ── */
 .summary-cards {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(var(--n, 4), 1fr);
   gap: 12px;
   padding: 16px 20px;
   max-width: 1200px;
@@ -357,12 +357,33 @@ function renderAll() {
   const maxName = allNames[vals.indexOf(maxVal)] || '--';
   const avg    = allNames.length ? total / allNames.length : 0;
 
+  // 有目標的指標:平均達成率 = 每位業務達成率的平均(只算有目標的人)
+  let avgPctCard = '';
+  if (metric.hasTarget) {
+    const pcts = allNames
+      .map((n, i) => {
+        const t = targets[n] && targets[n][metric.key];
+        return t ? vals[i] / t * 100 : null;
+      })
+      .filter(p => p !== null);
+    const avgPct = pcts.length ? Math.round(pcts.reduce((a,b) => a+b, 0) / pcts.length) : null;
+    const tgtTotal = allNames.reduce((s, n) => s + ((targets[n] && Number(targets[n][metric.key])) || 0), 0);
+    avgPctCard = `
+    <div class="summary-card">
+      <div class="card-label">平均達成率</div>
+      <div class="card-num"${avgPct !== null && avgPct >= 100 ? ' style="color:#16a34a"' : ''}>${avgPct === null ? '--' : avgPct + '%'}</div>
+      <div class="card-unit">全隊 ${fmtNum(total, metric.unit)} / ${fmtNum(tgtTotal, metric.unit)} ${metric.unit}</div>
+    </div>`;
+  }
+  document.getElementById('summary-cards').style.setProperty('--n', avgPctCard ? 5 : 4);
+
   document.getElementById('summary-cards').innerHTML = `
     <div class="summary-card">
       <div class="card-label">全隊${metric.label}</div>
       <div class="card-num">${fmtNum(total, metric.unit)}</div>
       <div class="card-unit">${metric.unit}${periodLabel ? '（' + periodLabel + '）' : ''}</div>
     </div>
+    ${avgPctCard}
     <div class="summary-card">
       <div class="card-label">個人最高</div>
       <div class="card-num">${fmtNum(maxVal, metric.unit)}</div>
