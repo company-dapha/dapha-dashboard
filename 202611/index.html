@@ -455,8 +455,7 @@ function renderAll() {
 // ════════════════════════════════════════
 async function loadData() {
   document.getElementById('update-time').textContent = '載入中…';
-  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbxQmdUfz7MhaKiixU8T5BjpE7qmReqveRaWmO4nCv5dO1mFk7fM6n8sbR2sgVlnTsKwxw/exec') {
-    DATA = FALLBACK; IS_DEMO = true;
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {    DATA = FALLBACK; IS_DEMO = true;
     renderAll(); return;
   }
   try {
