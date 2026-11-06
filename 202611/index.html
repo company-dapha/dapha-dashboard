@@ -88,6 +88,31 @@ body {
 }
 .metric-tab:hover { border-color: #c0152a; color: #c0152a; }
 .metric-tab.active { background: #c0152a; border-color: #c0152a; color: #fff; font-weight: 600; }
+/* 第二層:同一類別裡的細項 */
+.sub-tabs-wrap {
+  background: #fafafa;
+  padding: 8px 20px 10px;
+  border-bottom: 1px solid #e8e8e8;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.sub-tabs-wrap:empty { display: none; }
+.sub-tabs-label { font-size: 0.74rem; color: #999; margin-right: 4px; }
+.sub-tab {
+  padding: 4px 12px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #555;
+  font-size: 0.78rem;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.sub-tab:hover { border-color: #c0152a; color: #c0152a; }
+.sub-tab.active { border-color: #c0152a; color: #c0152a; font-weight: 700; background: #fdecee; }
 
 /* ── Summary Cards ── */
 .summary-cards {
@@ -193,6 +218,7 @@ body {
 
 <!-- Metric Tabs -->
 <div class="metric-tabs-wrap" id="metric-tabs"></div>
+<div class="sub-tabs-wrap" id="sub-tabs"></div>
 
 <!-- Demo Notice -->
 <div id="demo-notice-area"></div>
@@ -286,6 +312,30 @@ const FALLBACK = {
   s2: buildDemo(DEPT_CONFIG[1], { deacid_fam_cum:40, deacid_box_cum:500 }),
 };
 
+// ── 分類按鈕:第一排顯示類別,類別裡有多個項目時,第二排顯示細項 ──
+// [類別名稱, [[metric key, 細項名稱], ...]]
+const GROUPS = {
+  s1: [
+    ['廣告收款',   [['ad_fam_cum', '家數'], ['ad_recv_cum', '金額']]],
+    ['淺一收款',   [['s1_fam_cum', '家數'], ['s1_recv_cum', '金額']]],
+    ['訂單',       [['orders', '訂單家數']]],
+    ['佔比產品',   [['ratio_prod', '佔比產品數']]],
+    ['88宴會口',   [['banq_cum', '累計']]],
+    ['救心活動',   [['jiuxin_cum', '參加家數'], ['capfam_cum', '回收盒蓋家數'], ['capqty_cum', '回收盒蓋數量']]],
+    ['E視界 10 ml', [['ev_trad_cum', '傳統家數'], ['ev_box_cum', '傳統盒數'], ['ev_chain_cum', '連鎖家數']]],
+    ['EX錠',       [['ex_trad_cum', '傳統家數'], ['ex_box_cum', '傳統盒數'], ['ex_chain_cum', '連鎖家數']]],
+  ],
+  s2: [
+    ['廣告收款',   [['ad_fam_cum', '家數'], ['ad_recv_cum', '金額']]],
+    ['淺二收款',   [['s2_fam_cum', '家數'], ['s2_recv_cum', '金額']]],
+    ['訂單',       [['orders', '訂單家數']]],
+    ['佔比產品',   [['ratio_prod', '佔比產品數']]],
+    ['88宴會口',   [['banq_cum', '累計']]],
+    ['退熱貼',     [['deacid_fam_cum', '家數'], ['deacid_box_cum', '盒數']]],
+    ['OA 10 ml',   [['oa_trad_cum', '傳統家數'], ['oa_box_cum', '傳統盒數'], ['oa_chain_cum', '連鎖家數']]],
+  ],
+};
+
 // ════════════════════════════════════════
 // ② 狀態
 // ════════════════════════════════════════
@@ -328,6 +378,13 @@ function switchMetric(idx) {
   currentMetric = idx;
   renderAll();
 }
+function metricIndex(dept, key) { return dept.metrics.findIndex(m => m.key === key); }
+// 點類別 → 跳到該類別第一個細項
+function switchGroup(gi) {
+  const dept = DEPT_CONFIG[currentDept];
+  const idx = metricIndex(dept, GROUPS[dept.dataKey][gi][1][0][0]);
+  if (idx >= 0) switchMetric(idx);
+}
 
 // ════════════════════════════════════════
 // ③ 渲染
@@ -352,10 +409,18 @@ function renderAll() {
     ? '<div class="demo-notice">⚠ 目前顯示示範資料，請填入 APPS_SCRIPT_URL 後重新部署</div>'
     : '';
 
-  // metric tabs
-  document.getElementById('metric-tabs').innerHTML = dept.metrics.map((m, i) =>
-    `<button class="metric-tab${i === currentMetric ? ' active' : ''}" onclick="switchMetric(${i})">${m.label}</button>`
+  // metric tabs:第一排類別、第二排細項
+  const groups = (GROUPS[dk] || []).filter(g => g[1].some(([k]) => metricIndex(dept, k) >= 0));
+  const curGroup = groups.find(g => g[1].some(([k]) => k === metric.key));
+  document.getElementById('metric-tabs').innerHTML = groups.map(g =>
+    `<button class="metric-tab${g === curGroup ? ' active' : ''}" onclick="switchGroup(${(GROUPS[dk] || []).indexOf(g)})">${g[0]}</button>`
   ).join('');
+  document.getElementById('sub-tabs').innerHTML = (curGroup && curGroup[1].length > 1)
+    ? `<span class="sub-tabs-label">${curGroup[0]}：</span>` + curGroup[1]
+        .filter(([k]) => metricIndex(dept, k) >= 0)
+        .map(([k, lab]) => `<button class="sub-tab${k === metric.key ? ' active' : ''}" onclick="switchMetric(${metricIndex(dept, k)})">${lab}</button>`)
+        .join('')
+    : '';
 
   // 全隊統計
   const vals   = allNames.map(n => getValue(raw, n, metric.key, metric.type));
