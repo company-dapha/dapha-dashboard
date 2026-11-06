@@ -232,6 +232,12 @@ const DEPT_CONFIG = [
       { key:'jiuxin_cum',   label:'救心參加家數',       unit:'家', type:'cum', hasTarget:true,  period:'none'  },
       { key:'capfam_cum',   label:'回收盒蓋家數',       unit:'家', type:'cum', hasTarget:false,  period:'none'  },
       { key:'capqty_cum',   label:'回收盒蓋數量',       unit:'個', type:'cum', hasTarget:false,  period:'none'  },
+      { key:'ev_trad_cum',  label:'E視界傳統家數',      unit:'家', type:'cum', hasTarget:false, period:'none'  },
+      { key:'ev_box_cum',   label:'E視界傳統盒數',      unit:'盒', type:'cum', hasTarget:false, period:'none'  },
+      { key:'ev_chain_cum', label:'E視界連鎖家數',      unit:'家', type:'cum', hasTarget:false, period:'none'  },
+      { key:'ex_trad_cum',  label:'EX錠傳統家數',       unit:'家', type:'cum', hasTarget:false, period:'none'  },
+      { key:'ex_box_cum',   label:'EX錠傳統盒數',       unit:'盒', type:'cum', hasTarget:false, period:'none'  },
+      { key:'ex_chain_cum', label:'EX錠連鎖家數',       unit:'家', type:'cum', hasTarget:false, period:'none'  },
     ],
     dataKey: 's1',
   },
@@ -254,6 +260,9 @@ const DEPT_CONFIG = [
       { key:'banq_cum',          label:'88宴會口累計',         unit:'口', type:'cum', hasTarget:false, period:'none'  },
       { key:'deacid_fam_cum',    label:'脫酸寧退熱貼家數',     unit:'家', type:'cum', hasTarget:true,  period:'month' },
       { key:'deacid_box_cum',    label:'脫酸寧退熱貼盒數',     unit:'盒', type:'cum', hasTarget:true,  period:'month' },
+      { key:'oa_trad_cum',       label:'OA傳統家數',           unit:'家', type:'cum', hasTarget:false, period:'none'  },
+      { key:'oa_box_cum',        label:'OA傳統盒數',           unit:'盒', type:'cum', hasTarget:false, period:'none'  },
+      { key:'oa_chain_cum',      label:'OA連鎖家數',           unit:'家', type:'cum', hasTarget:false, period:'none'  },
     ],
     dataKey: 's2',
   },
@@ -446,7 +455,7 @@ function renderAll() {
 // ════════════════════════════════════════
 async function loadData() {
   document.getElementById('update-time').textContent = '載入中…';
-  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbxQmdUfz7MhaKiixU8T5BjpE7qmReqveRaWmO4nCv5dO1mFk7fM6n8sbR2sgVlnTsKwxw/exec') {
     DATA = FALLBACK; IS_DEMO = true;
     renderAll(); return;
   }
